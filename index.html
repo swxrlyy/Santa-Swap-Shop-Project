@@ -663,11 +663,11 @@
 
     /* Festive & Christmas Category Theme + Falling Snow (CSS-only, no emojis) */
     body.festive-mode {
-      background: #0f3d28;
+      background: #114b2f;
     }
 
     [data-theme="dark"] body.festive-mode {
-      background: #082216;
+      background: #0a2e1d;
     }
 
     body.festive-mode header h1 {
@@ -678,16 +678,11 @@
       color: #d6eadf;
     }
 
-    body.festive-mode .container {
-      position: relative;
-      z-index: 1;
-    }
-
     .snow-layer {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
+      z-index: 90;
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.45s ease;
@@ -699,22 +694,67 @@
 
     .snow-dot {
       position: absolute;
-      top: -12px;
+      top: -16px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.75);
       animation: snowFall linear infinite;
     }
 
     @keyframes snowFall {
-      0% { transform: translateY(-10px) translateX(0); opacity: 0; }
-      10% { opacity: 0.85; }
-      90% { opacity: 0.85; }
-      100% { transform: translateY(105vh) translateX(28px); opacity: 0; }
+      0% { transform: translateY(-16px) translateX(0); opacity: 0; }
+      10% { opacity: 0.95; }
+      90% { opacity: 0.9; }
+      100% { transform: translateY(106vh) translateX(32px); opacity: 0; }
     }
 
     .choice-card.festive-card {
-      border-color: var(--pine);
-      background: var(--pine-light);
+      position: relative;
+      overflow: hidden;
+      background: #1b5e3a;
+      border-color: var(--gold);
+    }
+
+    .choice-card.festive-card .choice-name,
+    .choice-card.festive-card .choice-meta {
+      position: relative;
+      z-index: 2;
+    }
+
+    .choice-card.festive-card .choice-name {
+      color: #ffffff;
+    }
+
+    .choice-card.festive-card .choice-meta {
+      color: #dceee4;
+    }
+
+    .choice-card.festive-card:hover {
+      background: #154d2f;
+      border-color: var(--gold);
+    }
+
+    .card-snow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .card-flake {
+      position: absolute;
+      top: -10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      animation: cardSnowFall linear infinite;
+    }
+
+    @keyframes cardSnowFall {
+      0% { transform: translateY(-10px) translateX(0); opacity: 0; }
+      15% { opacity: 0.9; }
+      85% { opacity: 0.9; }
+      100% { transform: translateY(110px) translateX(12px); opacity: 0; }
     }
   </style>
 </head>
@@ -841,16 +881,16 @@
       applyTheme(currentTheme, true);
     });
 
-    // Generate subtle CSS snow dots for Festive & Christmas category
+    // Generate visible CSS snow dots for Festive & Christmas category
     const snowLayer = document.getElementById('snowLayer');
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < 48; i++) {
       const dot = document.createElement('span');
       dot.className = 'snow-dot';
-      const size = (3 + Math.random() * 5).toFixed(1) + 'px';
+      const size = (4 + Math.random() * 6).toFixed(1) + 'px';
       dot.style.width = size;
       dot.style.height = size;
       dot.style.left = (Math.random() * 100).toFixed(2) + 'vw';
-      dot.style.animationDuration = (6 + Math.random() * 9).toFixed(1) + 's';
+      dot.style.animationDuration = (5 + Math.random() * 8).toFixed(1) + 's';
       dot.style.animationDelay = (-Math.random() * 12).toFixed(1) + 's';
       snowLayer.appendChild(dot);
     }
@@ -1045,7 +1085,20 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = `choice-card ${cat.id === 'festive' ? 'festive-card' : ''} ${selectedCategory === cat.id ? 'active' : ''}`;
+          let snowHtml = '';
+          if (cat.id === 'festive') {
+            const flakes = [];
+            for (let f = 0; f < 16; f++) {
+              const sz = (2.5 + (f % 4) * 1.1).toFixed(1);
+              const left = ((f * 19 + 5) % 95);
+              const dur = (2.4 + (f % 5) * 0.65).toFixed(2);
+              const del = (-(f * 0.43)).toFixed(2);
+              flakes.push(`<span class="card-flake" style="width:${sz}px;height:${sz}px;left:${left}%;animation-duration:${dur}s;animation-delay:${del}s;"></span>`);
+            }
+            snowHtml = `<span class="card-snow" aria-hidden="true">${flakes.join('')}</span>`;
+          }
           btn.innerHTML = `
+            ${snowHtml}
             <span class="choice-name">${cat.name}</span>
             <span class="choice-meta">${count} products</span>
           `;
